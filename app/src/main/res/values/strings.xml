@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ContinueWatch_2</string>
+    <string name="hello_world">hello_world</string>
+    <string name="seconds">Seconds elapsed threads:  %d</string>
+    <string name="secondsE">Seconds elapsed executor:  %d</string>
+    <string name="secondsC">Seconds elapsed corutines:  %d</string>
+
+    <string name="textview">TextView</string>
+</resources>
