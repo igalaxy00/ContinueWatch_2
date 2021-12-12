@@ -1,32 +1,41 @@
 package com.example.continuewatch_2
 
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import android.os.Handler
+
 class Main_ExecutionService: AppCompatActivity() {
-    var secondsElapsed: Int = 0
-    lateinit var textSecondsElapsed: TextView
-    private lateinit var executor: ExecutorService
+    private var secondsElapsed: Int = 0
+    private lateinit var textSecondsElapsed: TextView
+    private lateinit var handler: Handler
+    private lateinit var executor:ExecutorService
 
 
-    override fun onStart() {//right
-        super.onStart()
-        executor = Executors.newFixedThreadPool(1)
-        Log.d("mainActivity", "OnStart: seconds = $secondsElapsed")
-        executor.execute {
-            while(!executor.isShutdown) {
-                try {
-                    Log.d("mainActivity", "${Thread.currentThread()} is iterating")
-                    Thread.sleep(1000)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        handler = Handler(Looper.getMainLooper())
+        textSecondsElapsed = findViewById(R.id.textSecondsElapsed)
+    }
+
+    override fun onResume() {
+        executor = For_Exec().executor
+        executor.execute(object : Runnable {
+            override fun run() {
+                if (!executor.isShutdown) {
                     textSecondsElapsed.post {
-                        textSecondsElapsed.text = getString(R.string.secondsE, secondsElapsed++)
+                        textSecondsElapsed.text =
+                            getString(R.string.secondsE, secondsElapsed++)
                     }
-                }catch (e: Exception){}
+                    handler.postDelayed(this, 1000)
+                }
             }
-        }
+        })
+        super.onResume()
     }
 
     override fun onStop() {//right
@@ -35,28 +44,13 @@ class Main_ExecutionService: AppCompatActivity() {
         executor.shutdown()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        textSecondsElapsed = findViewById(R.id.textSecondsElapsed)
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.run { putInt(SECONDS, secondsElapsed) }
+        outState.putInt(getString(R.string.secondsE), secondsElapsed)
         super.onSaveInstanceState(outState)
-
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        secondsElapsed = savedInstanceState.getInt(getString(R.string.secondsE))
         super.onRestoreInstanceState(savedInstanceState)
-        savedInstanceState.run { secondsElapsed = getInt(SECONDS) }
     }
-
-
-    companion object {
-        const val SECONDS = "Seconds"
-    }
-
-
-
 }
