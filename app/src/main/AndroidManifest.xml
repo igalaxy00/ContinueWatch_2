@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ContinueWatch_2">
         <activity
-            android:name=".Main_ExecutionService"
+            android:name=".Main_Courutines"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

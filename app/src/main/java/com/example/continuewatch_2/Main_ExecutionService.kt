@@ -1,56 +1,62 @@
 package com.example.continuewatch_2
 
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.continuewatch_2.databinding.ActivityMain2Binding
 import java.util.concurrent.ExecutorService
-import android.os.Handler
+import java.util.concurrent.Future
+
 
 class Main_ExecutionService: AppCompatActivity() {
+
     private var secondsElapsed: Int = 0
     private lateinit var textSecondsElapsed: TextView
-    private lateinit var handler: Handler
-    private lateinit var executor:ExecutorService
+    private lateinit var backgroundFuture: Future<*>
 
+    private fun submitBackground(executorService: ExecutorService) = executorService.submit {
+        while (!executorService.isShutdown) {
+            Thread.sleep(1000)
+            textSecondsElapsed.post {
+                textSecondsElapsed.text = getString(R.string.secondsE, ++secondsElapsed)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        handler = Handler(Looper.getMainLooper())
-        textSecondsElapsed = findViewById(R.id.textSecondsElapsed)
+        val binding = ActivityMain2Binding.inflate(layoutInflater)
+        textSecondsElapsed = binding.textSecondsElapsed2
+        setContentView(binding.root)
     }
 
-    override fun onResume() {
-        executor = For_Exec().executor
-        executor.execute(object : Runnable {
-            override fun run() {
-                if (!executor.isShutdown) {
-                    textSecondsElapsed.post {
-                        textSecondsElapsed.text =
-                            getString(R.string.secondsE, secondsElapsed++)
-                    }
-                    handler.postDelayed(this, 1000)
-                }
-            }
-        })
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
+        backgroundFuture = submitBackground((applicationContext as For_Exec).executor)
     }
 
-    override fun onStop() {//right
+    override fun onStop() {
         super.onStop()
-        Log.d("mainActivity", "OnStop: seconds = $secondsElapsed")
-        executor.shutdown()
+        backgroundFuture.cancel(true)
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(getString(R.string.secondsE), secondsElapsed)
+        outState.run {
+            putInt(SEC, secondsElapsed)
+        }
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        secondsElapsed = savedInstanceState.getInt(getString(R.string.secondsE))
         super.onRestoreInstanceState(savedInstanceState)
+        savedInstanceState.run {
+            secondsElapsed = getInt(SEC)
+        }
+    }
+
+    companion object {
+        const val SEC = "secondsElapsed"
     }
 }
