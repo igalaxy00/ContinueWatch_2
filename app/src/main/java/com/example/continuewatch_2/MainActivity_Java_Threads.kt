@@ -32,6 +32,7 @@ class MainActivity_Java_Threads : AppCompatActivity() {
         super.onStart()
     }
 
+
     override fun onStop() {//right
         super.onStop()
         Log.d("mainActivity", "OnStop: seconds = $secondsElapsed")

@@ -16,7 +16,8 @@ class Main_ExecutionService: AppCompatActivity() {
     private lateinit var backgroundFuture: Future<*>
 
     private fun submitBackground(executorService: ExecutorService) = executorService.submit {
-        while (!executorService.isShutdown) {
+
+        while (!backgroundFuture.isCancelled) {//
             Thread.sleep(1000)
             textSecondsElapsed.post {
                 textSecondsElapsed.text = getString(R.string.secondsE, ++secondsElapsed)

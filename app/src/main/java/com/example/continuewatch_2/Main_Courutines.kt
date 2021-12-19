@@ -28,13 +28,12 @@ class Main_Courutines : AppCompatActivity() {
                     textSecondsElapsed.text = getString(R.string.secondsC, ++secondsElapsed)
                     delay(1000)
                 }
-        }
+            }
         }
     }
 
     override fun onStop() {//right
         super.onStop()
-
     }
 
 
